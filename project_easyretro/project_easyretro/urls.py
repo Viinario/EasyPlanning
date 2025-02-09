@@ -26,10 +26,9 @@ from django.views.decorators.csrf import csrf_exempt
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('app_easyretro.urls')),
-    path('', csrf_exempt(TemplateView.as_view(template_name='index.html'))), 
+    path('', include('app_easyretro.urls')),  # URLs do app no caminho raiz
+    path('', csrf_exempt(TemplateView.as_view(template_name='index.html'))),
 ] + static(settings.STATIC_URL, document_root=os.path.join(BASE_DIR, 'frontend', 'dist'))
 
