@@ -1,6 +1,8 @@
 from django.urls import path
-from .views import api_test
+from . import views
 
 urlpatterns = [
-    path('data/', api_test),  
+    path('api/test/', views.api_test, name='api_test'),
+    path('formulario/', views.create_formulario, name='create_formulario'),
+    path('formulario/<id>/', views.get_formulario, name='get_formulario'),
 ]
