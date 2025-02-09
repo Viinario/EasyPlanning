@@ -1,8 +1,11 @@
-from django.urls import path
-from . import views
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import FormViewSet, QuestionViewSet
+
+router = DefaultRouter()
+router.register(r'forms', FormViewSet)
+router.register(r'questions', QuestionViewSet)
 
 urlpatterns = [
-    path('api/test/', views.api_test, name='api_test'),
-    path('formulario/', views.create_formulario, name='create_formulario'),
-    path('formulario/<id>/', views.get_formulario, name='get_formulario'),
+    path('', include(router.urls)),
 ]
