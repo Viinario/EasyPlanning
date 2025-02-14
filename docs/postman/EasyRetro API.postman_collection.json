@@ -1,0 +1,309 @@
+{
+	"info": {
+		"_postman_id": "9e0088be-efd4-439c-83ac-4d1f460aec6c",
+		"name": "EasyRetro API",
+		"description": "Documentação dos endpoints da API do projeto EasyRetro",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19231139"
+	},
+	"item": [
+		{
+			"name": "Formulários",
+			"item": [
+				{
+					"name": "Obter todos os formulários",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/forms/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"forms",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obter um formulário específico",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/forms/:id/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"forms",
+								":id",
+								""
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Criar um novo formulário",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Meu Formulário\",\n  \"description\": \"Descrição do meu formulário\",\n  \"questions\": [\n    {\n      \"title\": \"Pergunta 1\",\n      \"description\": \"Descrição da pergunta 1\",\n      \"type\": \"linear\",\n      \"options\": [],\n      \"intensity\": 3\n    },\n    {\n      \"title\": \"Pergunta 2\",\n      \"description\": \"Descrição da pergunta 2\",\n      \"type\": \"multiple\",\n      \"options\": [\"Opção 1\", \"Opção 2\"],\n      \"intensity\": 5\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/forms/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"forms",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Atualizar um formulário específico",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Meu Formulário\",\n  \"description\": \"Descrição do meu formulário\",\n  \"questions\": [\n    {\n      \"title\": \"Nova Pergunta 1\",\n      \"description\": \"Nova Descrição da pergunta 1\",\n      \"type\": \"linear\",\n      \"options\": [],\n      \"intensity\": 3\n    },\n    {\n      \"title\": \"Nova Pergunta 2\",\n      \"description\": \"Nova Descrição da pergunta 2\",\n      \"type\": \"multiple\",\n      \"options\": [\"Opção 1\", \"Opção 2\", \"Nova Opção 3\"],\n      \"intensity\": 5\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/forms/:id/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"forms",
+								":id",
+								""
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Apagar um formulário específico",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/forms/:id/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"forms",
+								":id",
+								""
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Perguntas",
+			"item": [
+				{
+					"name": "Obter todas as perguntas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/questions/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"questions",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obter uma pergunta específica",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/questions/:id/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"questions",
+								":id",
+								""
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Criar uma nova pergunta",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"form\": 1,\n  \"title\": \"Nova Pergunta\",\n  \"description\": \"Descrição da nova pergunta\",\n  \"type\": \"linear\",\n  \"options\": [],\n  \"intensity\": 4\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/questions/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"questions",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Atualizar uma nova pergunta",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"form\": 1,\n  \"title\": \"Nova Pergunta\",\n  \"description\": \"Descrição da nova pergunta\",\n  \"type\": \"linear\",\n  \"options\": [],\n  \"intensity\": 4\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/questions/:id/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"questions",
+								":id",
+								""
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Apagar uma pergunta específica",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/questions/:id/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"questions",
+								":id",
+								""
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
