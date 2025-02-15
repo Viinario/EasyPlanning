@@ -2,8 +2,9 @@
     <div class="home-container">
       <h1>EasyPlanning</h1>
       <div class="buttons">
-        <button @click="goToForm">Acessar Formulário</button>
-        <button @click="goToDashboard">Visualizar Dashboard</button>
+        <button @click="goToForm">Criar Formulário</button>
+        <button @click="goToDashboard">Acessar Formulários</button>
+        <button @click="goToRespond">Responder Formulário</button>
       </div>
     </div>
   </template>
@@ -17,6 +18,9 @@
       },
       goToDashboard() {
         this.$router.push('/dashboard');
+      },
+      goToRespond() {
+        this.$router.push('/respond');
       }
     }
   };
