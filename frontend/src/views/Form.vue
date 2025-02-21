@@ -71,56 +71,130 @@
 </template>
 
 <script>
-export default {
-  name: 'FormPage',
-  data() {
-    return {
-      formTitle: '',
-      formDescription: '',
-      questions: [
-        {
-          title: '',
-          description: '',
-          type: 'linear',
-          options: ['']
-        }
-      ]
-    };
-  },
-  methods: {
-    addQuestion() {
-      this.questions.push({
-        title: '',
-        description: '',
-        type: 'linear',
-        options: ['']
-      });
+  import ApiService from "@/services/api.js";
+
+  export default {
+    name: "FormPage",
+    props: ["id"],
+    data() {
+      return {
+        formTitle: "",
+        formDescription: "",
+        questions: [],
+      };
     },
-    removeQuestion(index) {
-      this.questions.splice(index, 1);
-    },
-    addOption(index) {
-      this.questions[index].options.push('');
-    },
-    changeQuestionType(index) {
-      if (this.questions[index].type === 'multiple') {
-        this.questions[index].options = [''];
+    async created() {
+      if (this.id) {
+        await this.loadForm();
       }
     },
-    undo() {
-      console.log('Desfazer ação');
-    },
-    redo() {
-      console.log('Refazer ação');
-    },
-    toggleVisibility() {
-      console.log('Alternar visualização');
-    },
-    saveForm() {
-      console.log('Formulário salvo:', this.formTitle, this.questions);
+    methods: {
+      async loadForm() {
+        try {
+          const response = await ApiService.getFormById(this.id);
+          this.formTitle = response.data.title;
+          this.formDescription = response.data.description;
+          this.questions = response.data.questions;
+        } catch (error) {
+          console.error("Erro ao carregar formulário:", error);
+        }
+      },
+      changeQuestionType(index) {
+        if (this.questions[index].type === "multiple") {
+            this.questions[index].options = [""];
+        } else {
+            this.questions[index].options = [];
+        }
+      },
+      addQuestion() {
+        this.questions.push({
+          title: "",
+          description: "",
+          type: "linear",
+          options: [],
+          intensity: 1
+        });
+      },
+      removeQuestion(index) {
+        this.questions.splice(index, 1);
+      },
+      addOption(index) {
+        this.questions[index].options.push("");
+      },
+      async saveForm() {
+        try {            
+            if (!this.formTitle.trim()) {
+                alert("O título do formulário é obrigatório.");
+                return;
+            }
+            if (!this.formDescription.trim()) {
+                alert("A descrição do formulário é obrigatória.");
+                return;
+            }            
+            if (this.questions.length === 0) {
+                alert("Adicione pelo menos uma pergunta antes de salvar.");
+                return;
+            }            
+            for (const [index, question] of this.questions.entries()) {
+                if (!question.title.trim()) {
+                    alert(`A pergunta ${index + 1} precisa de um título.`);
+                    return;
+                }
+                if (!question.type) {
+                    alert(`A pergunta ${index + 1} precisa de um tipo definido.`);
+                    return;
+                }             
+                if (question.type === "multiple") {
+                    const validOptions = question.options.filter(opt => opt.trim() !== "");
+                    if (validOptions.length === 0) {
+                        alert(`A pergunta ${index + 1} de múltipla escolha precisa ter pelo menos uma opção.`);
+                        return;
+                    }
+                }                
+                if (question.type === "linear" && (question.intensity === null || question.intensity <= 0)) {
+                    alert(`A pergunta ${index + 1} de escala linear precisa ter uma intensidade válida.`);
+                    return;
+                }
+            }            
+            const formData = {
+                title: this.formTitle.trim(),
+                description: this.formDescription.trim(),
+                questions: this.questions.map(q => ({
+                    title: q.title.trim(),
+                    description: q.description.trim(),
+                    type: q.type,
+                    options: q.type === "multiple" ? q.options.filter(opt => opt.trim() !== "") : [],
+                    intensity: q.type === "linear" ? q.intensity : null
+                })),
+            };
+
+            console.log("Enviando formulário para API:", formData);
+           
+            const response = this.id
+                ? await ApiService.updateForm(this.id, formData)
+                : await ApiService.createForm(formData);
+
+            alert("Formulário salvo com sucesso!");
+            console.log("Resposta da API:", response.data);
+
+            this.$router.push("/dashboard");
+        } catch (error) {
+            console.error("Erro ao salvar formulário:", error);
+            console.error("Detalhes do erro:", error.response?.data);
+            alert(`Erro ao salvar: ${error.response?.data?.message || "Erro desconhecido"}`);
+        }
+      },
+      undo() {
+        this.$router.go(-1);
+      },
+      redo() {
+        this.$router.go(1);
+      },
+      toggleVisibility() {
+        console.log("Alternar visualização");
+      },
     }
-  }
-};
+  };
 </script>
 
 <style scoped>
@@ -180,11 +254,11 @@ export default {
 }
 
 .save-button:hover {
-  background-color: rgb(150, 206, 153);
-}
+    transform: scale(1.05);
+    transition: background-color 0.3s, transform 0.2s;
+  }
 
 .form-container {
-  /*background: #fff;*/
   border-radius: 10px;
   margin-top: 120px;
   display: flex;
