@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomePage from '../views/Home.vue';
 import FormPage from '../views/Form.vue';
-import DashboardPage from '../views/Dashboard.vue';
-import RespondForm from '../views/RespondForm.vue';
-import AnswerForm from '@/views/AnswerForm.vue';
+import DashboardPage from '../views/FormDashboard.vue';
+import RespondForm from '../views/FormRespond.vue';
+import AnswerForm from '@/views/FormAnswer.vue';
 
 const routes = [
   { path: '/', component: HomePage },         
