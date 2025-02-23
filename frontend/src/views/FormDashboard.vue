@@ -1,17 +1,14 @@
 <template>
-  <div class="dashboard-container">
+  <div class="container">
     <header class="header">
-      <h1>Dashboard</h1>    
+      <h1>Dashboard dos formulários</h1>    
       <div class="header-actions">
-      <button @click="undo" class="undo-button">
-        <img src="@/assets/do-icon.png" alt="Desfazer" />
-      </button>        
-      <button @click="redo" class="redo-button">
-        <img src="@/assets/do-icon.png" alt="Refazer" />
-      </button>        
-      <button @click="toggleVisibility" class="toggle-visibility-button">
-        <img src="@/assets/icon-toggle.png" alt="Visualizar" />
-      </button>
+        <button @click="$router.push('/')" class="home-button">
+            <img src="@/assets/home-icon.png" alt="Home" />
+          </button>
+        <button @click="undo" class="undo-button">
+          <img src="@/assets/do-icon.png" alt="Desfazer" />
+        </button>              
       </div>
     </header>
 
@@ -63,31 +60,20 @@
         },
         undo() {
           this.$router.go(-1);
-        },
-        redo() {
-          this.$router.go(1);
-        },
-        toggleVisibility() {
-          console.log("Alternar visualização");
-        },
+        },        
       }
     };
   </script>
   
   <style scoped> 
-  .dashboard-container {
+  .container {
     padding: 20px;
     font-family: Arial, sans-serif;
     background-color: #BBC8C8;
     min-height: 100vh;
     text-align: center;
   }
-  
-  h1 {
-    color: #333;
-    
-  }
-  
+   
   button {
     background-color: #358600;
     color: white;
@@ -106,7 +92,7 @@
     list-style-type: none;
     padding: 0;
     margin: 0;
-    padding-top: 100px;
+    padding-top: 200px;
   }
 
   li {
@@ -138,52 +124,53 @@
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
+    font-family: 'Istok Web', sans-serif; 
   }
 
   .header-actions {
     display: flex;
+    justify-content: space-between;
     align-items: center;
+    width: 96%;
+    padding: 0 20px;
     position: absolute;
-    right: 148px;
-    bottom: 16px;    
+    top: 35%;
+    left: 0;
+    transform: translateY(-50%);
   }
 
-  .undo-button,
-  .redo-button,
-  .toggle-visibility-button{
+  .undo-button {
     background: none;
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 15px;
     transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
-    border-radius: 50%;
     width: 5px;
-    height: 5px;
+    height: 8px;
+  }
+
+  .home-button {    
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;    
+    transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;        
   }
 
   .undo-button img,
-  .redo-button img {
+  .home-button img {
     width: 24px;
     height: 24px;
   }
-
-  .toggle-visibility-button img {
-    width: 32px;
-    height: 32px;
-    padding-top: 5px;  
-  }
-
+  
   .undo-button:hover,
-  .redo-button:hover, 
-  .toggle-visibility-button:hover {
+  .home-button:hover {
     transform: translateY(-3px) scale(1.1);
-    background-color: rgba(#DEE7E7, 67, 67, 0.1);}
-
-  .redo-button img {
-    transform: scaleX(-1);
+    background-color: rgba(#DEE7E7, 67, 67, 0.1);
   }
 
   .delete-button {
@@ -206,10 +193,39 @@
     transition: background-color 0.3s, transform 0.2s;
   }
 
+  .new-form {    
+    transform: scale(1.05);
+    transition: background-color 0.3s, transform 0.2s;
+    margin-top: 100px;
+  }
+
   .new-form:hover {    
     transform: scale(1.05);
     transition: background-color 0.3s, transform 0.2s;
   }
 
+  @media (max-width: 800px) {
+    .header-actions {
+      width: 85%;
+    }  
+  }
+
+  @media (max-width: 1000px) {
+    .header-actions {
+      width: 90%;
+    }  
+  }
+
+  @media (max-width: 1200px) {
+    .header-actions {
+      width: 90%;
+    }  
+  }
+
+  @media (max-width: 1500px) {
+    .header-actions {
+      width: 90%;
+    }  
+  }
 </style>
   
