@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Form, Question
+from .models import Form, Question, Answer
+
 
 class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -34,7 +35,7 @@ class FormSerializer(serializers.ModelSerializer):
         for question_data in questions_data:
             Question.objects.create(form=form, **question_data)
         return form
-    
+
     def update(self, instance, validated_data):
         questions_data = validated_data.pop('questions')
         instance.title = validated_data.get('title', instance.title)
@@ -63,3 +64,29 @@ class FormSerializer(serializers.ModelSerializer):
                 question.delete()
 
         return instance
+
+
+class AnswerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Answer
+        fields = '__all__'
+
+    def validate(self, data):
+        question = data.get('question')
+        answer_value = data.get('answer')
+        if question is None:
+            raise serializers.ValidationError("Question must be provided.")
+
+        # Validate based on question type
+        if question.type == "multiple":
+            # Ensure answer_value is one of the available options
+            # Assuming question.options is a list (stored via JSONField)
+            if question.options is None or answer_value not in question.options:
+                raise serializers.ValidationError("Answer must be one of the available options.")
+        elif question.type == "linear":
+            # Ensure the answer is an integer (or can be converted to one)
+            try:
+                int_answer = int(answer_value)
+            except (ValueError, TypeError):
+                raise serializers.ValidationError("Answer must be an integer for linear questions.")
+        return data

@@ -24,3 +24,11 @@ class Question(models.Model):
 
     def __str__(self):
         return self.title
+class Answer(models.Model):
+    form = models.ForeignKey('Form', related_name='answers', on_delete=models.CASCADE)
+    question = models.ForeignKey('Question', on_delete=models.CASCADE)
+    # Use JSONField for flexibility. Alternatively, you might use a CharField or IntegerField based on your design.
+    answer = models.JSONField()
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return f"Answer for {self.question} on {self.form}"
