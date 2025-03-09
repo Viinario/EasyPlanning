@@ -15,6 +15,10 @@ export default {
     return await axios.post("http://localhost:8000/api/answers/", { answers });
   },
 
+  async getAnswers(id) {
+    return await axios.get(`http://localhost:8000/api/answers/?formId=${id}`);
+  },
+
   createForm(data) {
     return axios.post(`${API_URL}forms/`, data);
   },
