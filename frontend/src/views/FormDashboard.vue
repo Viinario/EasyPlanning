@@ -17,6 +17,7 @@
         <strong>{{ form.title }}</strong> - {{ form.description }}
         <button class="edit-button" @click="goToEditForm(form.id)">Editar</button>
         <button class="delete-button" @click="deleteForm(form.id)">Excluir</button>
+        <button class="edit-button" @click="goToAnswers(form.id)">Visualizar Respostas</button>
       </li>
     </ul>
 
@@ -47,6 +48,9 @@
         },
         goToEditForm(id) {
           this.$router.push(`/form/${id}`);
+        },
+        goToAnswers(id) {
+          this.$router.push(`/formAnswers/${id}`)
         },
         async deleteForm(id) {
           if (confirm("Tem certeza que deseja excluir este formulário?")) {
