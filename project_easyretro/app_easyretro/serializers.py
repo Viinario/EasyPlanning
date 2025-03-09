@@ -67,9 +67,27 @@ class FormSerializer(serializers.ModelSerializer):
 
 
 class AnswerSerializer(serializers.ModelSerializer):
+    question_description = serializers.CharField(source='question.description', read_only=True)
+    question_type = serializers.CharField(source='question.type', read_only=True)
+    form_title = serializers.CharField(source='form.description', read_only=True)
+    multiple_options = serializers.ListField(
+        child=serializers.CharField(),
+        source='question.options',
+        read_only=True
+    )
     class Meta:
         model = Answer
-        fields = '__all__'
+        fields = [
+            'id',
+            'form',
+            'form_title',
+            'question',
+            'answer',
+            'question_description',
+            'question_type',
+            'multiple_options',
+            'submitted_at'
+        ]
 
     def validate(self, data):
         question = data.get('question')
