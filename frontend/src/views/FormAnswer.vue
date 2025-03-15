@@ -2,8 +2,8 @@
   <div class="container">
     <header class="header">
       <div class="header-content">
-        <h1>{{ formTitle }}</h1>
-        <h2>{{ formDescription }}</h2>
+        <h1>{{ projectName }}</h1>
+        <h3 class="sprint-text">Sprint: {{ sprint }}</h3>
       </div>
       <div class="header-actions">
         <button @click="$router.push('/')" class="home-button">
@@ -63,10 +63,11 @@ export default {
   name: "AnswerForm",
   data() {
     return {
-      formTitle: "",
+      projectName: "",
+      sprint: "",
       formDescription: "",
       questions: [],
-      answers: [], // Armazena as respostas do usuário
+      answers: [],
     };
   },
   async created() {
@@ -79,7 +80,8 @@ export default {
     async loadForm(id) {
       try {
         const response = await ApiService.getFormById(id);
-        this.formTitle = response.data.title;
+        this.projectName = response.data.project_name;
+        this.sprint = response.data.sprint;
         this.formDescription = response.data.description;
         this.questions = response.data.questions;
         this.answers = new Array(this.questions.length).fill(null);
@@ -93,7 +95,6 @@ export default {
     async submitAnswers() {
       try {
         const formId = this.$route.params.id;
-        // Build payload with the required structure: form, question, answer.
         const payload = this.questions.map((question, index) => ({
           form: formId,
           question: question.id,
@@ -121,7 +122,7 @@ export default {
   padding: 20px;
   font-family: Arial, sans-serif;
   text-align: center;
-  padding-top: 102px;
+  padding-top: 120px; /* espaço para o header */
 }
 
 .question-card {
@@ -132,7 +133,7 @@ export default {
   text-align: left;
   width: 60%;
   max-width: 800px;
-  box-shadow: -5px 5px 4px 0px rgba(0, 0, 0, 0.2);
+  box-shadow: -5px 5px 4px rgba(0, 0, 0, 0.2);
 }
 
 .linear-scale {
@@ -186,7 +187,7 @@ export default {
 .button-submit:hover {
   transform: translateY(-3px) scale(1.1);    
   transition: background-color 0.3s, transform 0.2s;
-  background-color: #388e3c;   
+  background-color: #388e3c;
 }
 
 .button-cancel {
@@ -205,89 +206,58 @@ export default {
   transition: background-color 0.3s, transform 0.2s;
 }
 
+/* Header atualizado */
 .header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   background-color: #DEE7E7;
-  height: 43px;
   width: 100%;
   padding: 10px 20px;
-  border-radius: 0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  z-index: 1000;    
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .header-content {
   display: flex;
   flex-direction: column;
   align-items: center;
+  text-align: center;
 }
 
 .header h1 {
-  flex-grow: 1;
-  text-align: center;
-  margin: 0;
   font-size: 24px;
-  position: absolute;
-  top: 5px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: 'Istok Web', sans-serif; 
+  margin: 0;
+  font-family: 'Istok Web', sans-serif;
+}
+
+.sprint-text {
+  font-size: 18px;
+  margin: 5px 0 0 0;
 }
 
 .header-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 96%;
-  padding: 0 20px;
   position: absolute;
+  right: 20px;
   top: 50%;
-  left: 0;
   transform: translateY(-50%);
 }
 
-.header h2 {
-  flex-grow: 1;
-  text-align: center;
-  margin: 0;
-  font-size: 14px;
-  position: absolute;
-  bottom: 4px;    
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: 'Istok Web', sans-serif; 
-}
-
+.home-button,
 .undo-button {
   background: none;
   border: none;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
-  width: 5px;
-  height: 5px;
+  transition: transform 0.2s, background-color 0.2s;
 }
 
-.home-button {    
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;    
-  transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;        
-}
-
-.undo-button img,
-.home-button img {
+.home-button img,
+.undo-button img {
   width: 24px;
   height: 24px;
 }
@@ -295,30 +265,6 @@ export default {
 .undo-button:hover,
 .home-button:hover {
   transform: translateY(-3px) scale(1.1);
-  background-color: rgba(#DEE7E7, 67, 67, 0.1);
-}
-
-@media (max-width: 800px) {
-  .header-actions {
-    width: 85%;
-  }  
-}
-
-@media (max-width: 1000px) {
-  .header-actions {
-    width: 90%;
-  }  
-}
-
-@media (max-width: 1200px) {
-  .header-actions {
-    width: 90%;
-  }  
-}
-
-@media (max-width: 1500px) {
-  .header-actions {
-    width: 90%;
-  }  
+  background-color: rgba(222, 231, 231, 0.1);
 }
 </style>

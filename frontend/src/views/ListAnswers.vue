@@ -1,13 +1,16 @@
 <template>
   <div class="container">
     <header class="header">
-      <div v-if="answers.length">
-        <h1>{{ answers[0].form_title }}</h1>
-      </div>  
-      <div class="header-actions">
+      <div class="header-left">
         <button @click="$router.push('/')" class="home-button">
           <img src="@/assets/home-icon.png" alt="Home" />
         </button>
+      </div>
+      <div class="header-content" v-if="answers.length">
+        <h1>{{ answers[0].project_name }}</h1>
+        <h2 class="sprint">Sprint: {{ answers[0].sprint }}</h2>
+      </div>
+      <div class="header-right">
         <button @click="undo" class="undo-button">
           <img src="@/assets/do-icon.png" alt="Desfazer" />
         </button>              
@@ -102,7 +105,6 @@ export default {
       }
     },
     getScaleRange(max) {
-      // If intensity is not defined, default to 5
       const intensity = max || 5;
       return Array.from({ length: intensity }, (_, i) => i + 1);
     },
@@ -112,7 +114,6 @@ export default {
   },
   computed: {
     aggregatedInfo() {
-      // Group answers by question id
       const groups = {};
       this.answers.forEach(answer => {
         const qId = answer.question;
@@ -121,26 +122,22 @@ export default {
             question_id: qId,
             question_description: answer.question_description,
             question_type: answer.question_type,
-            intensity: answer.intensity, // for linear questions
+            intensity: answer.intensity,
             answers: []
           };
         }
         groups[qId].answers.push(answer.answer);
       });
-      // Compute aggregated value per group
       return Object.values(groups).map(group => {
         if (group.question_type === "linear") {
-          // Calculate the mean
           const sum = group.answers.reduce((acc, val) => acc + Number(val), 0);
           const mean = sum / group.answers.length;
           return { ...group, mean: mean.toFixed(2) };
         } else if (group.question_type === "multiple") {
-          // Count frequency for each option
           const frequency = {};
           group.answers.forEach(ans => {
             frequency[ans] = (frequency[ans] || 0) + 1;
           });
-          // Get the most chosen option
           const mostChosen = Object.keys(frequency).reduce((a, b) =>
             frequency[a] >= frequency[b] ? a : b
           );
@@ -154,25 +151,95 @@ export default {
 </script>
 
 <style scoped>
-h1 {
+.container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background-color: #BBC8C8;
+  min-height: 100vh;
+  text-align: center;
+}
+
+/* Header styles com layout em três colunas */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #DEE7E7;
+
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+.header-left,
+.header-right {
+  width: 40px; /* Largura fixa para os botões */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.header-content {
+  flex-grow: 1;
+  text-align: center;
+}
+.header-content h1 {
+  margin: 0;
   font-size: 24px;
-  margin-bottom: 20px;
+  font-family: 'Istok Web', sans-serif;
 }
-h2 {
-  font-size: 20px;
-  margin-bottom: 10px;
+.sprint {
+  margin-top: 4px;
+  font-size: 16px;
+  line-height: 1.2;  
 }
+
+/* Botões */
+.home-button,
+.undo-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+}
+.home-button img,
+.undo-button img {
+  width: 24px;
+  height: 24px;
+}
+.home-button:hover,
+.undo-button:hover {
+  transform: translateY(-3px) scale(1.1);
+  background-color: rgba(222, 231, 231, 0.1);
+}
+
+/* Aggregated info styles */
+.aggregated-info {
+  margin: 120px 0 20px;
+  text-align: left;
+  padding: 0 20px;
+}
+.aggregate-item {
+  margin-bottom: 15px;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 10px;
+}
+
 ul {
   list-style-type: none;
   padding: 0;
+  margin: 0;
+  margin-top: 20px;
 }
 li {
   border: 1px solid #ccc;
   padding: 10px;
   margin-bottom: 10px;
+  text-align: left;
 }
 
-/* Styles for the linear scale widget */
+/* Demais estilos mantidos */
 .linear-scale {
   margin: 10px 0;
 }
@@ -192,90 +259,10 @@ li {
   font-size: 14px;
   margin-top: 10px;
 }
-
-/* Styles for multiple-choice widget */
 .multiple-choice {
   margin: 10px 0;
 }
 .multiple-choice div {
   margin-bottom: 5px;
-}
-
-/* Container and header styles */
-.container {
-  padding: 20px;
-  font-family: Arial, sans-serif;
-  background-color: #BBC8C8;
-  min-height: 100vh;
-  text-align: center;
-}
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #DEE7E7;
-  height: 43px;
-  width: 100%;
-  padding: 10px 20px;
-  border-radius: 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-}
-.header div h1 {
-  flex-grow: 1;
-  text-align: center;
-  margin: 0;
-  font-size: 24px;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: 'Istok Web', sans-serif;
-}
-.header-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 96%;
-  padding: 0 20px;
-  position: absolute;
-  top: 35%;
-  left: 0;
-  transform: translateY(-50%);
-}
-.home-button,
-.undo-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
-}
-.home-button img,
-.undo-button img {
-  width: 24px;
-  height: 24px;
-}
-.undo-button:hover,
-.home-button:hover {
-  transform: translateY(-3px) scale(1.1);
-  background-color: rgba(#DEE7E7, 67, 67, 0.1);
-}
-
-/* Aggregated info styles */
-.aggregated-info {
-  margin: 120px 0 20px; /* space below header */
-  text-align: left;
-  padding: 0 20px;
-}
-.aggregate-item {
-  margin-bottom: 15px;
-  border-bottom: 1px solid #ccc;
-  padding-bottom: 10px;
 }
 </style>
