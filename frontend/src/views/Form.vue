@@ -3,16 +3,20 @@
     <header class="header">
       <h1>Cadastro de Formulários</h1>    
       <div class="header-actions">
-      <button @click="undo" class="undo-button">
-        <img src="@/assets/do-icon.png" alt="Desfazer" />
-      </button>              
-      <button class="save-button" @click="saveForm">Salvar</button>
+        <button @click="undo" class="undo-button">
+          <img src="@/assets/do-icon.png" alt="Desfazer" />
+        </button>              
+        <button class="save-button" @click="saveForm">Salvar</button>
       </div>
     </header>
 
     <div class="form-container">
       <div class="form-title-box">
-        <input type="text" class="form-title" placeholder="Formulário sem título" v-model="formTitle" />
+        <input type="text" class="project-name" placeholder="Nome do projeto" v-model="projectName" />
+        <select v-model="sprint" class="sprint-select">
+          <option disabled value="">Selecione a sprint</option>
+          <option v-for="n in 10" :key="n" :value="n">Sprint {{ n }}</option>
+        </select>
         <textarea class="form-description" placeholder="Descrição do formulário" v-model="formDescription"></textarea>
       </div>
 
@@ -66,7 +70,7 @@
             <img src="@/assets/icon-plus.png" alt="Adicionar Alternativa" />
           </button>
         </div>        
-        <button @click="removeQuestion" class="delete-question">
+        <button @click="removeQuestion(index)" class="delete-question">
           <img src="@/assets/icon-trash.png" alt="Deletar Pergunta" />
         </button>
       </div>
@@ -86,7 +90,8 @@
     props: ["id"],
     data() {
       return {
-        formTitle: "",
+        projectName: "",
+        sprint: "",
         formDescription: "",
         questions: [],
       };
@@ -100,7 +105,9 @@
       async loadForm() {
         try {
           const response = await ApiService.getFormById(this.id);
-          this.formTitle = response.data.title;
+          // Carrega os novos campos do formulário
+          this.projectName = response.data.project_name;
+          this.sprint = response.data.sprint;
           this.formDescription = response.data.description;
           this.questions = response.data.questions;
         } catch (error) {
@@ -109,9 +116,9 @@
       },
       changeQuestionType(index) {
         if (this.questions[index].type === "multiple") {
-            this.questions[index].options = [""];
+          this.questions[index].options = [""];
         } else {
-            this.questions[index].options = [];
+          this.questions[index].options = [];
         }
       },
       addQuestion() {
@@ -131,73 +138,78 @@
       },
       async saveForm() {
         try {            
-            if (!this.formTitle.trim()) {
-                alert("O título do formulário é obrigatório.");
-                return;
+          if (!this.projectName.trim()) {
+            alert("O nome do projeto é obrigatório.");
+            return;
+          }
+          if (!this.sprint) {
+            alert("A sprint é obrigatória.");
+            return;
+          }
+          if (!this.formDescription.trim()) {
+            alert("A descrição do formulário é obrigatória.");
+            return;
+          }            
+          if (this.questions.length === 0) {
+            alert("Adicione pelo menos uma pergunta antes de salvar.");
+            return;
+          }            
+          for (const [index, question] of this.questions.entries()) {
+            if (!question.title.trim()) {
+              alert(`A pergunta ${index + 1} precisa de um título.`);
+              return;
             }
-            if (!this.formDescription.trim()) {
-                alert("A descrição do formulário é obrigatória.");
+            if (!question.type) {
+              alert(`A pergunta ${index + 1} precisa de um tipo definido.`);
+              return;
+            }             
+            if (question.type === "multiple") {
+              const validOptions = question.options.filter(opt => opt.trim() !== "");
+              if (validOptions.length === 0) {
+                alert(`A pergunta ${index + 1} de múltipla escolha precisa ter pelo menos uma opção.`);
                 return;
-            }            
-            if (this.questions.length === 0) {
-                alert("Adicione pelo menos uma pergunta antes de salvar.");
-                return;
-            }            
-            for (const [index, question] of this.questions.entries()) {
-                if (!question.title.trim()) {
-                    alert(`A pergunta ${index + 1} precisa de um título.`);
-                    return;
-                }
-                if (!question.type) {
-                    alert(`A pergunta ${index + 1} precisa de um tipo definido.`);
-                    return;
-                }             
-                if (question.type === "multiple") {
-                    const validOptions = question.options.filter(opt => opt.trim() !== "");
-                    if (validOptions.length === 0) {
-                        alert(`A pergunta ${index + 1} de múltipla escolha precisa ter pelo menos uma opção.`);
-                        return;
-                    }
-                }                
-                if (question.type === "linear" && (question.intensity === null || question.intensity <= 0)) {
-                    alert(`A pergunta ${index + 1} de escala linear precisa ter uma intensidade válida.`);
-                    return;
-                }
-            }            
-            const formData = {
-                title: this.formTitle.trim(),
-                description: this.formDescription.trim(),
-                questions: this.questions.map(q => ({
-                    title: q.title.trim(),
-                    description: q.description.trim(),
-                    type: q.type,
-                    options: q.type === "multiple" ? q.options.filter(opt => opt.trim() !== "") : [],
-                    intensity: q.type === "linear" ? q.intensity : null
-                })),
-            };
+              }
+            }                
+            if (question.type === "linear" && (question.intensity === null || question.intensity <= 0)) {
+              alert(`A pergunta ${index + 1} de escala linear precisa ter uma intensidade válida.`);
+              return;
+            }
+          }            
+          const formData = {
+            project_name: this.projectName.trim(),
+            sprint: this.sprint,
+            description: this.formDescription.trim(),
+            questions: this.questions.map(q => ({
+              title: q.title.trim(),
+              description: q.description.trim(),
+              type: q.type,
+              options: q.type === "multiple" ? q.options.filter(opt => opt.trim() !== "") : [],
+              intensity: q.type === "linear" ? q.intensity : null
+            })),
+          };
 
-            console.log("Enviando formulário para API:", formData);
-           
-            const response = this.id
-                ? await ApiService.updateForm(this.id, formData)
-                : await ApiService.createForm(formData);
+          console.log("Enviando formulário para API:", formData);
+         
+          const response = this.id
+              ? await ApiService.updateForm(this.id, formData)
+              : await ApiService.createForm(formData);
 
-            alert("Formulário salvo com sucesso!");
-            console.log("Resposta da API:", response.data);
+          alert("Formulário salvo com sucesso!");
+          console.log("Resposta da API:", response.data);
 
-            this.$router.push("/dashboard");
+          this.$router.push("/dashboard");
         } catch (error) {
-            console.error("Erro ao salvar formulário:", error);
-            console.error("Detalhes do erro:", error.response?.data);
-            alert(`Erro ao salvar: ${error.response?.data?.message || "Erro desconhecido"}`);
+          console.error("Erro ao salvar formulário:", error);
+          console.error("Detalhes do erro:", error.response?.data);
+          alert(`Erro ao salvar: ${error.response?.data?.message || "Erro desconhecido"}`);
         }
       },
       undo() {
         this.$router.go(-1);
       },   
       toggleQuestionType(index) {
-          this.questions[index].type = this.questions[index].type === "linear" ? "multiple" : "linear";
-        },
+        this.questions[index].type = this.questions[index].type === "linear" ? "multiple" : "linear";
+      },
       setQuestionType(index, type) {
         this.questions[index].type = type;
       },
@@ -206,6 +218,7 @@
 </script>
 
 <style scoped>
+  /* (Mantém os estilos já existentes – opcionalmente pode-se ajustar o estilo do .sprint-select) */
   @import url('https://fonts.googleapis.com/css2?family=Istok+Web&display=swap');
 
   .container {
@@ -290,45 +303,21 @@
     font-family: 'Istok Web', sans-serif;
   }
 
-  .form-title-box input {
+  .project-name, .sprint-select {
     width: 73%; 
-  }
-
-  .form-title-box textarea {
-    resize: none;
-    overflow-y: auto;
-    max-height: 150px; 
-    font-family: 'Istok Web', sans-serif;
-    padding: 10px;
-    border: none;
-    background-color: #DEE7E7;
-    height: 22px;
-    width: 70%; 
-  }
-
-  .form-title-box input::placeholder {
-    color: black;
-  }
-
-  .form-title-box textarea::placeholder {
-    color: black;
-  }
-
-  .form-title-box input {
     padding: 0px 10px;
     border: none;
     background-color: #DEE7E7;    
   }
 
-  .form-title {
-    font-size: 40px;
-    font-weight: 400;
-    color: black;
-  }
-
   .form-description {
     font-size: 14px;
     margin-left: 30px;
+  }
+
+  .form-title-box input::placeholder,
+  .form-title-box textarea::placeholder {
+    color: black;
   }
 
   .question-card {
@@ -342,20 +331,12 @@
     position: relative;  
   }
 
-  .question-card input {
-    background-color: #DEE7E7;  
-    border: none;  
-    font-family: 'Istok Web', sans-serif;
-    width: 70% 
-  }
-
+  .question-card input,
   .question-card textarea {
     background-color: #DEE7E7;  
     border: none;
-    flex: 0.7;
-    resize: none;
-    overflow-y: auto;
-    width: 70% 
+    font-family: 'Istok Web', sans-serif;
+    width: 70%;
   }
 
   .question-card input::placeholder {
@@ -523,7 +504,7 @@
   .add-option-button:hover,
   .add-question:hover {
     transform: translateY(-3px) scale(1.1);
-    transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+    transition: background-color 0.3s, transform 0.2s;
   }
 
   .delete-question {
@@ -573,7 +554,8 @@
 
   .undo-button:hover {
     transform: translateY(-3px) scale(1.1);
-    background-color: rgba(#DEE7E7, 67, 67, 0.1);}
+    background-color: rgba(#DEE7E7, 67, 67, 0.1);
+  }
 
   .multiple-choice {
     flex-direction: column;
@@ -599,9 +581,9 @@
   .texarea-box{    
     font-family: 'Istok Web', sans-serif;    
     margin-right: 250px;
-    width: 100%;  /* Garante que ocupe toda a largura disponível */
-    min-height: 5px;  /* Define uma altura mínima */
-    max-height: 20px;  /* Define uma altura máxima para evitar crescimento excessivo */        
+    width: 100%;  
+    min-height: 5px;         
+    max-height: 20px;        
   }
 
   .question-type-buttons {
@@ -627,11 +609,5 @@
   .question-type-buttons button:hover {
     background: #2d6b00;
     color: white;
-  }
-
-  @media (max-width: 600px) {
-    .option-radio {
-      left: -215px;
-    }  
   }
 </style>

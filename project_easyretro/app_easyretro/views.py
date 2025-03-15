@@ -3,7 +3,6 @@ from rest_framework.response import Response
 from .models import Form, Question, Answer
 from .serializers import FormSerializer, QuestionSerializer, AnswerSerializer
 
-
 class FormViewSet(viewsets.ModelViewSet):
     queryset = Form.objects.all()
     serializer_class = FormSerializer
@@ -14,7 +13,6 @@ class QuestionViewSet(viewsets.ModelViewSet):
 
 class AnswerViewSet(viewsets.ViewSet):
     def create(self, request):
-        # Extract the answers list from the payload
         answers_data = request.data.get("answers")
         if answers_data is None:
             return Response(

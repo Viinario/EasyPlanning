@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from .models import Form, Question, Answer
 
-
 class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
@@ -38,11 +37,11 @@ class FormSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         questions_data = validated_data.pop('questions')
-        instance.title = validated_data.get('title', instance.title)
+        instance.project_name = validated_data.get('project_name', instance.project_name)
+        instance.sprint = validated_data.get('sprint', instance.sprint)
         instance.description = validated_data.get('description', instance.description)
         instance.save()
 
-        # Atualizar perguntas
         keep_questions = []
         for question_data in questions_data:
             if 'id' in question_data:
@@ -58,29 +57,30 @@ class FormSerializer(serializers.ModelSerializer):
                 question = Question.objects.create(form=instance, **question_data)
                 keep_questions.append(question.id)
 
-        # Remover perguntas que não estão na lista de manutenção
         for question in instance.questions.all():
             if question.id not in keep_questions:
                 question.delete()
 
         return instance
 
-
 class AnswerSerializer(serializers.ModelSerializer):
     question_description = serializers.CharField(source='question.description', read_only=True)
     question_type = serializers.CharField(source='question.type', read_only=True)
-    form_title = serializers.CharField(source='form.description', read_only=True)
+    project_name = serializers.CharField(source='form.project_name', read_only=True)
+    sprint = serializers.IntegerField(source='form.sprint', read_only=True)
     multiple_options = serializers.ListField(
         child=serializers.CharField(),
         source='question.options',
         read_only=True
     )
+
     class Meta:
         model = Answer
         fields = [
             'id',
             'form',
-            'form_title',
+            'project_name',
+            'sprint',
             'question',
             'answer',
             'question_description',
@@ -95,16 +95,12 @@ class AnswerSerializer(serializers.ModelSerializer):
         if question is None:
             raise serializers.ValidationError("Question must be provided.")
 
-        # Validate based on question type
         if question.type == "multiple":
-            # Ensure answer_value is one of the available options
-            # Assuming question.options is a list (stored via JSONField)
             if question.options is None or answer_value not in question.options:
                 raise serializers.ValidationError("Answer must be one of the available options.")
         elif question.type == "linear":
-            # Ensure the answer is an integer (or can be converted to one)
             try:
-                int_answer = int(answer_value)
+                int(answer_value)
             except (ValueError, TypeError):
                 raise serializers.ValidationError("Answer must be an integer for linear questions.")
         return data

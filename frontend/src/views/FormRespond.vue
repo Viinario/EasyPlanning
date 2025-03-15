@@ -1,189 +1,182 @@
 <template>
-    <div class="container">
-      <header class="header">
-        <h1>Escolha um formulário para responder</h1>
-        <div class="header-actions">
-          <button @click="$router.push('/')" class="home-button">
-            <img src="@/assets/home-icon.png" alt="Home" />
-          </button>
-          <button @click="undo" class="undo-button">
-            <img src="@/assets/do-icon.png" alt="Desfazer" />
-          </button>              
+  <div class="container">
+    <header class="header">
+      <h1>Escolha um formulário para responder</h1>
+      <div class="header-actions">
+        <button @click="$router.push('/')" class="home-button">
+          <img src="@/assets/home-icon.png" alt="Home" />
+        </button>
+        <button @click="undo" class="undo-button">
+          <img src="@/assets/do-icon.png" alt="Desfazer" />
+        </button>              
+      </div>
+    </header>
+    <ul>
+      <li v-for="form in forms" :key="form.id">
+        <div class="form-info">
+          <strong>{{ form.project_name }}</strong> - Sprint: {{ form.sprint }} - {{ form.description }}
         </div>
-      </header>
-      <ul>
-        <li v-for="form in forms" :key="form.id">
-          <strong>{{ form.title }}</strong> - {{ form.description }}
+        <div class="responder-section">
+          <a :href="generateAccessLink(form)" target="_blank" class="access-link">
+            Acessar formulário
+          </a>
           <button @click="goToAnswerForm(form.id)">Responder</button>
-        </li>
-      </ul>       
-    </div>
-  </template>
-  
-  <script>
-  import ApiService from "@/services/api.js";
-  
-  export default {
-    name: "RespondForm",
-    data() {
-      return {
-        forms: [],
-      };
+        </div>
+      </li>
+    </ul>       
+  </div>
+</template>
+
+<script>
+import ApiService from "@/services/api.js";
+
+export default {
+  name: "RespondForm",
+  data() {
+    return {
+      forms: [],
+    };
+  },
+  async created() {
+    await this.fetchForms();
+  },
+  methods: {
+    async fetchForms() {
+      try {
+        const response = await ApiService.getForms();
+        this.forms = response.data;
+      } catch (error) {
+        console.error("Erro ao buscar formulários:", error);
+      }
     },
-    async created() {
-      await this.fetchForms();
+    generateAccessLink(form) {
+      // Gera um link completo com base no domínio atual e no ID do formulário.
+      return window.location.origin + `/answer/${form.id}`;
     },
-    methods: {
-      async fetchForms() {
-        try {
-          const response = await ApiService.getForms();
-          this.forms = response.data;
-        } catch (error) {
-          console.error("Erro ao buscar formulários:", error);
-        }
-      },
-      goToAnswerForm(id) {
-        this.$router.push(`/answer/${id}`);
-      },
-      undo() {
-          this.$router.go(-1);
-      },
+    goToAnswerForm(id) {
+      this.$router.push(`/answer/${id}`);
     },
-  };
-  </script>
-  
-  <style scoped>
-  .container {
-    padding: 20px;
-    font-family: Arial, sans-serif;
-    background-color: #BBC8C8;
-    min-height: 100vh;
-    text-align: center;
-  }
+    undo() {
+      this.$router.go(-1);
+    },
+  },
+};
+</script>
 
-  ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    padding-top: 200px;
-  }
+<style scoped>
+.container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background-color: #BBC8C8;
+  min-height: 100vh;
+  text-align: center;
+}
 
-  li {
-    margin-bottom: 20px;
-  }
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  padding-top: 200px;
+}
 
-  button {
-    background-color: #358600;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-left: 10px;    
-  }
+li {
+  margin-bottom: 20px;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+}
 
-  button:hover {
-    transform: scale(1.05);
-    transition: background-color 0.3s, transform 0.2s;
-  }
+.form-info {
+  margin-bottom: 10px;
+}
 
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #DEE7E7;
-    height: 43px;
-    width: 100%;
-    padding: 10px 20px;
-    border-radius: 0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;  
-  }
+.responder-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
 
-  .header h1 {
-    flex-grow: 1;
-    text-align: center;
-    margin: 0;
-    font-size: 24px;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    font-family: 'Istok Web', sans-serif; 
-  }
+.access-link {
+  font-weight: bold;
+  color: #358600;
+  text-decoration: none;
+  background-color: #f1f1f1;
+  padding: 5px 8px;
+  border-radius: 5px;
+  font-size: 14px;
+}
 
-  .header-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 96%;
-    padding: 0 20px;
-    position: absolute;
-    top: 50%;
-    left: 0;
-    transform: translateY(-50%);
-  }
+button {
+  background-color: #358600;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 10px;
+}
 
-  .undo-button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
-    width: 5px;
-    height: 5px;
-  }
+button:hover {
+  transform: scale(1.05);
+  transition: background-color 0.3s, transform 0.2s;
+}
 
-  .home-button {    
-    background: none;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;    
-    transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;        
-  }
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #DEE7E7;
+  height: 43px;
+  width: 100%;
+  padding: 10px 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
 
-  .undo-button img,
-  .home-button img {
-    width: 24px;
-    height: 24px;
-  }
-  
-  .undo-button:hover,
-  .home-button:hover {
-    transform: translateY(-3px) scale(1.1);
-    background-color: rgba(#DEE7E7, 67, 67, 0.1);
-  }
-  
-  @media (max-width: 800px) {
-    .header-actions {
-      width: 85%;
-    }  
-  }
+.header h1 {
+  flex-grow: 1;
+  text-align: center;
+  margin: 0;
+  font-size: 24px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Istok Web', sans-serif;
+}
 
-  @media (max-width: 1000px) {
-    .header-actions {
-      width: 90%;
-    }  
-  }
+.header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 96%;
+  padding: 0 20px;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
 
-  @media (max-width: 1200px) {
-    .header-actions {
-      width: 90%;
-    }  
-  }
+.home-button,
+.undo-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+}
 
-  @media (max-width: 1500px) {
-    .header-actions {
-      width: 90%;
-    }  
-  }
+.home-button img,
+.undo-button img {
+  width: 24px;
+  height: 24px;
+}
 
-  </style>
-  
+.undo-button:hover,
+.home-button:hover {
+  transform: translateY(-3px) scale(1.1);
+  background-color: rgba(222, 231, 231, 0.1);
+}
+</style>
